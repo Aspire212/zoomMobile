@@ -1,7 +1,8 @@
 'use strict';
+
 const img = document.querySelector('.image-wrapper img');
 
-//let hData = getSizeData(window.getComputedStyle(img).getPropertyValue('height'));
+let hData = getSizeData(window.getComputedStyle(img).getPropertyValue('height'));
 let wData = getSizeData(window.getComputedStyle(img).getPropertyValue('width'));
 
 let zoomToggle = false;
@@ -15,33 +16,37 @@ const coords = {
 	ey: 0,
 }
 
+window.addEventListener('load',  () => {
+  img.addEventListener('dblclick', () => {
+    zoomToggle = !zoomToggle;
+    if (zoomToggle) {
+      img.style.cursor = 'zoom-out';
+      img.style.width = `${wData.size * 2}${wData.unit}`;
+      img.style.height = `${hData.size * 2}${wData.unit}`;
+  
+    }
+    else {
+      img.style.cursor = 'zoom-in';
+      img.style.width = `${wData.size}${wData.unit}`;
+      img.style.transform = 'translate(0%, 0%)';
+    }
+  });
+  img.addEventListener('touchstart', (e) => {
+    if (zoomToggle) {
+      img.draggable = false;
+      coords.x = e.touches[0].clientX;
+      coords.y = e.touches[0].clientY;
+  
+      img.addEventListener('touchmove', move)
+      window.addEventListener('touchend', () => {
+        img.removeEventListener('touchmove', move);
+        coords.ex = coords.dx;
+        coords.ey = coords.dy;
+      });
+    }
+  });
+})
 
-img.addEventListener('dblclick', () => {
-	zoomToggle = !zoomToggle;
-	if (zoomToggle) {
-		img.style.cursor = 'zoom-out';
-		img.style.width = `${wData.size * 2}${wData.unit}`;
-	}
-	else {
-		img.style.cursor = 'zoom-in';
-		img.style.width = `${wData.size}${wData.unit}`;
-		img.style.transform = 'translate(0%, 0%)';
-	}
-});
-img.addEventListener('touchstart', (e) => {
-	if (zoomToggle) {
-		img.draggable = false;
-		coords.x = e.touches[0].clientX;
-		coords.y = e.touches[0].clientY;
-
-		img.addEventListener('touchmove', move)
-		window.addEventListener('touchend', () => {
-			img.removeEventListener('touchmove', move);
-			coords.ex = coords.dx;
-			coords.ey = coords.dy;
-		});
-	}
-});
 
 function move(e) {
 	coords.dx = e.touches[0].clientX - coords.x + coords.ex;
