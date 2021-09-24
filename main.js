@@ -16,7 +16,7 @@ const coords = {
 }
 
 
-img.addEventListener('click', () => {
+img.addEventListener('dblclick', () => {
 	zoomToggle = !zoomToggle;
 	if (zoomToggle) {
 		img.style.cursor = 'zoom-out';
@@ -47,6 +47,8 @@ function move(e) {
 	zoomToggle = false;
 	coords.dx = e.touches[0].clientX - coords.x + coords.ex;
 	coords.dy = e.touches[0].clientY - coords.y + coords.ey;
+	coords.ex = 0;
+	coords.ey = 0;
 	img.style.transform = `translate(${checkBorder(coords.dx / 2)}%, ${checkBorder(coords.dy / 2)}%)`
 }
 
