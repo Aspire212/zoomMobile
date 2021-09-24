@@ -44,7 +44,6 @@ img.addEventListener('touchstart', (e) => {
 });
 
 function move(e) {
-	zoomToggle = false;
 	coords.dx = e.touches[0].clientX - coords.x + coords.ex;
 	coords.dy = e.touches[0].clientY - coords.y + coords.ey;
 	coords.ex = 0;
