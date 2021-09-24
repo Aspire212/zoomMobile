@@ -21,6 +21,7 @@ class ZoomMobile {
 					this.img.style.height = `${this.hData.size * 2}${this.wData.unit}`;
 			} else {
 					this.img.style.width = `${this.wData.size}${this.wData.unit}`;
+					this.img.style.height = `${this.hData.size}${this.hData.unit}`;
 					this.img.style.transform = 'translate(0%, 0%)';
 			}
 		});
@@ -32,8 +33,8 @@ class ZoomMobile {
 					this.img.addEventListener('touchmove', this.move)
 					window.addEventListener('touchend', () => {
 						this.img.removeEventListener('touchmove', this.move);
-						this.coords.ex = coords.dx;
-						this.coords.ey = coords.dy;
+						this.coords.ex = this.coords.dx;
+						this.coords.ey = this.coords.dy;
 					});
 				}
 		}, {
