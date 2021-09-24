@@ -44,6 +44,8 @@ window.addEventListener('load',  () => {
         coords.ey = coords.dy;
       });
     }
+  }, {
+    passive: true,
   });
 })
 
