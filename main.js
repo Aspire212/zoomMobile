@@ -28,15 +28,15 @@ img.addEventListener('click', () => {
 		img.style.transform = 'translate(0%, 0%)';
 	}
 });
-img.addEventListener('mousedown', (e) => {
+img.addEventListener('touchstart', (e) => {
 	if (zoomToggle) {
 		img.draggable = false;
-		coords.x = e.clientX;
-		coords.y = e.clientY;
+		coords.x = e.touches[0].clientX;
+		coords.y = e.touches[0].clientY;
 
-		img.addEventListener('mousemove', move)
-		window.addEventListener('mouseup', () => {
-			img.removeEventListener('mousemove', move);
+		img.addEventListener('touchmove', move)
+		window.addEventListener('touchend', () => {
+			img.removeEventListener('touchmove', move);
 			coords.ex = coords.dx;
 			coords.ey = coords.dy;
 		});
@@ -45,9 +45,8 @@ img.addEventListener('mousedown', (e) => {
 
 function move(e) {
 	zoomToggle = false;
-	coords.dx = e.clientX - coords.x + coords.ex;
-	coords.dy = e.clientY - coords.y + coords.ey;
-	console.log(coords.dx, coords.dy)
+	coords.dx = e.touches[0].clientX - coords.x + coords.ex;
+	coords.dy = e.touches[0].clientY - coords.y + coords.ey;
 	img.style.transform = `translate(${checkBorder(coords.dx / 2)}%, ${checkBorder(coords.dy / 2)}%)`
 }
 
