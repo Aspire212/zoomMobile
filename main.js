@@ -49,6 +49,7 @@ window.addEventListener('load',  () => {
 
 
 function move(e) {
+  e.preventDefault();
 	coords.dx = e.touches[0].clientX - coords.x + coords.ex;
 	coords.dy = e.touches[0].clientY - coords.y + coords.ey;
 	//coords.ex = 0;
