@@ -46,7 +46,7 @@ body {
 
 
 .modal-active {
-	top: 12vh;
+	top: 6vh;
 	transform: translate(-50%, 0);
 }
 
