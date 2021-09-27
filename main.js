@@ -43,7 +43,7 @@ class ZoomInside {
 					this.img.draggable = false;
 					this.coords.x = this.ev.mouseEv ? e.clientX : e.touches[0].clientX;
 					this.coords.y = this.ev.mouseEv ? e.clientY : e.touches[0].clientY;
-					this.img.addEventListener(this.ev.run, this.move, {passive: true});
+					this.img.addEventListener(this.ev.run, this.move);
 					window.addEventListener(this.ev.end, () => {
 						this.img.removeEventListener(this.ev.run, this.move);
 						this.coords.ex = this.coords.dx;
@@ -71,7 +71,7 @@ class ZoomInside {
 		};
 	}
 	checkBorder(coord) {
-		if (coord >= 0) return  0;
+		if (coord >= 25) return  25;
 		else if (coord <= -25) return -25;
 		else return coord;
 	}
@@ -92,7 +92,7 @@ const closeModal = document.querySelector('.close-modal');
 
 img.addEventListener('click', (e) => {
 	if (modal.classList.contains('modal-active')) return;
-	modal.prepend(createImage(img.src, 'alt', modal.offsetHeight, 20));
+	modal.prepend(createImage(img.src, `${img.alt}-modal`, modal.offsetHeight, 20));
 	modal.classList.add('modal-active');
 	document.body.style.overflow = 'hidden';
 });
