@@ -1,7 +1,7 @@
 'use strict';
 
-class ZoomMobile {
-	constructor(img) {
+class ZoomInside {
+	constructor(img, zoomToggle = false) {
 		this.img = img;
 		this.hData = this.getSizeData(window.getComputedStyle(this.img).getPropertyValue('height'));
 		this.wData = this.getSizeData(window.getComputedStyle(this.img).getPropertyValue('width'));
@@ -14,7 +14,23 @@ class ZoomMobile {
 			ex: 0,
 			ey: 0,
 		};
+		this.ev = {
+			mouseEv: true,
+			isTouch: 'ontouchstart',
+			begin: 'mousedown',
+			run: 'mousemove',
+			end: 'mouseup',
+		}
+
+		if (this.ev.isTouch in document.documentElement) {
+			this.ev.mouseEv = false;
+			this.ev.begin = 'touchstart'; // тригер для beginX
+			this.ev.run = 'touchmove'; // тригер для runX
+			this.ev.end = 'touchend'; // тригер для endI и удаления тригера run
+			console.log(this.ev.begin )
+		}
 		this.img.addEventListener('dblclick', () => {
+			console.log('dblclick')
 			this.zoomToggle = !this.zoomToggle;
 			if (this.zoomToggle) {
 					this.img.style.width = `${this.wData.size * 2}${this.wData.unit}`;
@@ -25,16 +41,18 @@ class ZoomMobile {
 					this.img.style.transform = 'translate(0%, 0%)';
 			}
 		});
-		this.img.addEventListener('touchstart', (e) => {
+		this.img.addEventListener(this.ev.begin, (e) => {
 			if (this.zoomToggle) {
 					this.img.draggable = false;
-					this.coords.x = e.touches[0].clientX;
-					this.coords.y = e.touches[0].clientY;
-					this.img.addEventListener('touchmove', this.move)
-					window.addEventListener('touchend', () => {
-						this.img.removeEventListener('touchmove', this.move);
+					this.coords.x = this.ev.mouseEv ? e.clientX : e.touches[0].clientX;
+					this.coords.y = this.ev.mouseEv ? e.clientY : e.touches[0].clientY;
+					this.img.addEventListener(this.ev.run, this.move, {passive: true})
+					window.addEventListener(this.ev.end, () => {
+						this.img.removeEventListener(this.ev.run, this.move);
 						this.coords.ex = this.coords.dx;
 						this.coords.ey = this.coords.dy;
+						this.coords.dx = 0;
+						this.coords.dy = 0;
 					});
 				}
 		}, {
@@ -43,9 +61,11 @@ class ZoomMobile {
 	}
 	move = (e) => {
 		e.preventDefault();
-		this.coords.dx = e.touches[0].clientX - this.coords.x + this.coords.ex;
-		this.coords.dy = e.touches[0].clientY - this.coords.y + this.coords.ey;
-		this.img.style.transform = `translate(${this.checkBorder(this.coords.dx / 4)}%, ${this.checkBorder(this.coords.dy / 4)}%)`
+		this.coords.dx = (this.ev.mouseEv? e.clientX : e.touches[0].clientX) - this.coords.x + this.coords.ex;
+		this.coords.dy = (this.ev.mouseEv? e.clientY : e.touches[0].clientY) - this.coords.y + this.coords.ey;
+		let x = this.checkBorder(this.coords.dx/4)
+		let y = this.checkBorder(this.coords.dy/4)
+		this.img.style.transform = `translate(${x}%, ${y}%)`
 	}
 	getSizeData(data) {
 		let size = parseInt(data);
@@ -56,84 +76,71 @@ class ZoomMobile {
 		};
 	}
 	checkBorder(coord) {
-		if (coord >= 25) return 25;
+		if (coord >= 0) return  0;
 		else if (coord <= -25) return -25;
-		else return coord;
+		else return coord
 	}
 }
-window.addEventListener('load', () => new ZoomMobile(document.querySelector('.image-wrapper img')));
+//window.addEventListener('load', () => new ZoomMobile(document.querySelector('.image-wrapper img')));
 
 
 
-// const img = document.querySelector('.image-wrapper img');
+const img = document.querySelector('.image-wrapper img');
+const modal = document.querySelector('.modal');
+const closeModal = document.querySelector('.close-modal');
+let hData = getSizeData(window.getComputedStyle(modal).getPropertyValue('height'));
+let wData = getSizeData(window.getComputedStyle(img).getPropertyValue('width'));
 
-// let hData = getSizeData(window.getComputedStyle(img).getPropertyValue('height'));
-// let wData = getSizeData(window.getComputedStyle(img).getPropertyValue('width'));
+img.addEventListener('click', (e) => {
+	if (modal.classList.contains('modal-active')) return;
+	modal.prepend(createImage(img.src, 'alt', modal.offsetHeight, 20))
+	modal.classList.add('modal-active');
+	document.body.style.overflow = 'hidden';
+});
 
-// let zoomToggle = false;
-
-// const coords = {
-// 	x: 0,
-// 	y: 0,
-// 	dx: 0,
-// 	dy: 0,
-// 	ex: 0,
-// 	ey: 0,
-// }
-
-// window.addEventListener('load',  () => {
-//   img.addEventListener('dblclick', () => {
-//     zoomToggle = !zoomToggle;
-//     if (zoomToggle) {
-//       img.style.cursor = 'zoom-out';
-//       img.style.width = `${wData.size * 2}${wData.unit}`;
-//       img.style.height = `${hData.size * 2}${wData.unit}`;
-  
-//     }
-//     else {
-//       img.style.cursor = 'zoom-in';
-//       img.style.width = `${wData.size}${wData.unit}`;
-//       img.style.transform = 'translate(0%, 0%)';
-//     }
-//   });
-//   img.addEventListener('touchstart', (e) => {
-//     if (zoomToggle) {
-//       img.draggable = false;
-//       coords.x = e.touches[0].clientX;
-//       coords.y = e.touches[0].clientY;
-  
-//       img.addEventListener('touchmove', move)
-//       window.addEventListener('touchend', () => {
-//         img.removeEventListener('touchmove', move);
-//         coords.ex = coords.dx;
-//         coords.ey = coords.dy;
-//       });
-//     }
-//   }, {
-//     passive: true,
-//   });
-// })
-
-
-// function move(e) {
-//   e.preventDefault();
-// 	coords.dx = e.touches[0].clientX - coords.x + coords.ex;
-// 	coords.dy = e.touches[0].clientY - coords.y + coords.ey;
-// 	//coords.ex = 0;
-// 	//coords.ey = 0;
-// 	img.style.transform = `translate(${checkBorder(coords.dx / 4)}%, ${checkBorder(coords.dy / 4)}%)`
-// }
+modal.addEventListener('click', (e) => {
+	if (e.target === e.currentTarget || e.target === closeModal) {
+		modal.classList.remove('modal-active');
+		document.body.style.overflow = 'visible';
+		if (!modal.classList.contains('modal-active')){
+			setTimeout(() => {
+				modal.removeChild(modal.children[0]);
+			}, 100);
+		}
+	}
+	else if(e.target.classList.contains('image-modal')) {
+		return
+	}
+});
 
 
 
-// function getSizeData(data) {
-// 	let size = parseInt(data);
-// 	let unit = data.slice(String(size).length);
-// 	return {size, unit};
-// }
 
-// function checkBorder(coord) {
-// 	if (coord >= 25) return 25;
-// 	else if (coord <= -25) return -25;
-// 	else return coord;
-// }
+function createImage(src, alt, mH, mP){
+	let img = document.createElement('img');
+	img.src = src;
+	img.alt = alt;
+	img.draggable = false;
+	img.className = 'image-modal';
+	img.style.height = `${mH - mP}px`;
+	img.style.width = 'auto';
+	img.addEventListener('mouseenter', () => {
+		new ZoomInside(img);
+	})
+	return img
+}
+
+function getSizeData(data) {
+	let size = parseInt(data);
+	let unit = data.slice(String(size).length);
+	return {
+		size,
+		unit
+	};
+}
+
+
+/*
+	отключить прокрутку body если модалка открыта
+
+*/
